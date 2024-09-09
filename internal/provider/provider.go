@@ -131,6 +131,7 @@ func New() *schema.Provider {
 			"auth0_rule_config":                   rule.NewConfigResource(),
 			"auth0_tenant":                        tenant.NewResource(),
 			"auth0_user":                          user.NewResource(),
+			"auth0_user_authentication_method":    user.NewAuthenticationMethodResource(),
 			"auth0_user_permission":               user.NewPermissionResource(),
 			"auth0_user_permissions":              user.NewPermissionsResource(),
 			"auth0_user_role":                     user.NewRoleResource(),
