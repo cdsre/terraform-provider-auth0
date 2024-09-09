@@ -46,6 +46,12 @@ func SetResourceGroupID(data *schema.ResourceData, resourceGroup ...string) {
 	data.SetId(strings.Join(resourceGroup, separator))
 }
 
+// IsResourceGroupID checks if the given ID is a resource group ID by checking if it
+// contains the separator.
+func IsResourceGroupID(id string) bool {
+	return strings.Contains(id, separator)
+}
+
 func errInvalidID(resourceGroup ...string) error {
 	var formattedErrorMessage []string
 	for _, s := range resourceGroup {

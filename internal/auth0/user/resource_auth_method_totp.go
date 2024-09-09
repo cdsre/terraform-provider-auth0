@@ -40,17 +40,17 @@ func NewAuthenticationMethodResource() *schema.Resource {
 				Description: "Base32 encoded secret for TOTP generation.",
 			},
 		},
-		CreateContext: createUserAuthenticationMethod,
-		ReadContext:   readUserAuthenticationMethod,
-		DeleteContext: deleteUserAuthenticationMethod,
+		CreateContext: createUserAuthMethodTOTP,
+		ReadContext:   readUserAuthMethodTOTP,
+		DeleteContext: deleteUserAuthMethodTOTP,
 		Importer: &schema.ResourceImporter{
-			StateContext: internalSchema.ImportResourceGroupID("user_id", "resource_server_identifier", "permission"),
+			StateContext: internalSchema.ImportResourceGroupID("user_id", "type", "name", "totp_secret"),
 		},
 		Description: "With this resource, you can manage user authentication methods.",
 	}
 }
 
-func createUserAuthenticationMethod(ctx context.Context, data *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func createUserAuthMethodTOTP(ctx context.Context, data *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	api := meta.(*config.Config).GetAPI()
 
 	userID := data.Get("user_id").(string)
@@ -66,16 +66,25 @@ func createUserAuthenticationMethod(ctx context.Context, data *schema.ResourceDa
 		return diag.FromErr(err)
 	}
 
-	id, err := getUserAuthenticationMethodID(ctx, data, meta)
+	id, err := getUserAuthMethodTOTPID(ctx, data, meta)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	data.SetId(id)
-	return readUserAuthenticationMethod(ctx, data, meta)
+	return readUserAuthMethodTOTP(ctx, data, meta)
 }
 
-func readUserAuthenticationMethod(ctx context.Context, data *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func readUserAuthMethodTOTP(ctx context.Context, data *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	api := meta.(*config.Config).GetAPI()
+
+	// if the ID is a resource group ID, it means it was imported so we need to go look up its real ID
+	if internalSchema.IsResourceGroupID(data.Id()) {
+		id, err := getUserAuthMethodTOTPID(ctx, data, meta)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		data.SetId(id)
+	}
 
 	userID := data.Get("user_id").(string)
 	id := data.Id()
@@ -98,7 +107,7 @@ func readUserAuthenticationMethod(ctx context.Context, data *schema.ResourceData
 	return nil
 }
 
-func deleteUserAuthenticationMethod(ctx context.Context, data *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func deleteUserAuthMethodTOTP(ctx context.Context, data *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	api := meta.(*config.Config).GetAPI()
 
 	userID := data.Get("user_id").(string)
@@ -111,7 +120,7 @@ func deleteUserAuthenticationMethod(ctx context.Context, data *schema.ResourceDa
 	return nil
 }
 
-func getUserAuthenticationMethodID(ctx context.Context, data *schema.ResourceData, meta interface{}) (string, error) {
+func getUserAuthMethodTOTPID(ctx context.Context, data *schema.ResourceData, meta interface{}) (string, error) {
 	api := meta.(*config.Config).GetAPI()
 
 	userID := data.Get("user_id").(string)
