@@ -86,12 +86,17 @@ func readUserAuthenticationMethod(ctx context.Context, data *schema.ResourceData
 	}
 
 	for _, authMethod := range authMethods.Authenticators {
-		if authMethod.ID == &id {
-			return diag.FromErr(flattenUserAuthenticationMethod(data, authMethod))
+		if *authMethod.ID == id {
+			return nil
 		}
 	}
 
+	if !data.IsNewResource() {
+		data.SetId("")
+	}
+
 	return nil
+	//return diag.FromErr(fmt.Errorf("Expected to have found something"))
 }
 
 func deleteUserAuthenticationMethod(ctx context.Context, data *schema.ResourceData, meta interface{}) diag.Diagnostics {
@@ -120,7 +125,7 @@ func getUserAuthenticationMethodID(ctx context.Context, data *schema.ResourceDat
 	}
 
 	for _, authMethod := range authMethods.Authenticators {
-		if authMethod.Name == &name && authMethod.Type == &authType {
+		if *authMethod.Name == name && *authMethod.Type == authType {
 			return *authMethod.ID, nil
 		}
 	}

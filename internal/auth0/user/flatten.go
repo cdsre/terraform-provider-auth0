@@ -110,13 +110,3 @@ func flattenUserRolesSlice(roles []*management.Role) []string {
 	}
 	return userRoles
 }
-
-func flattenUserAuthenticationMethod(data *schema.ResourceData, authentcationMethod *management.AuthenticationMethod) error {
-	result := multierror.Append(
-		data.Set("type", authentcationMethod.Type),
-		data.Set("name", authentcationMethod.Name),
-		data.Set("totp_secret", authentcationMethod.Type),
-	)
-
-	return result.ErrorOrNil()
-}
