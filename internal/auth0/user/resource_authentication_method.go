@@ -96,7 +96,6 @@ func readUserAuthenticationMethod(ctx context.Context, data *schema.ResourceData
 	}
 
 	return nil
-	//return diag.FromErr(fmt.Errorf("Expected to have found something"))
 }
 
 func deleteUserAuthenticationMethod(ctx context.Context, data *schema.ResourceData, meta interface{}) diag.Diagnostics {
@@ -130,5 +129,5 @@ func getUserAuthenticationMethodID(ctx context.Context, data *schema.ResourceDat
 		}
 	}
 
-	return "NOTFOUND", nil
+	return "", nil
 }
